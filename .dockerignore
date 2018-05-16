@@ -1,0 +1,3 @@
+/bazel-bin
+/.git
+/third_party
