@@ -24,5 +24,6 @@
   "homepage": "https://github.com/zaucy/grpc-web#readme",
   "dependencies": {
     "download": "^7.0.0"
-  }
+  },
+  "license": "Apache-2.0"
 }
