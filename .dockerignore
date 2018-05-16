@@ -1,3 +1,4 @@
 /bazel-bin
 /.git
 /third_party
+/grpc-gen-protoc-gen-grpc-web

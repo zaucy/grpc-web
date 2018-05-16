@@ -1,0 +1,28 @@
+{
+  "name": "@grpc-gen/protoc-gen-grpc-web",
+  "version": "0.0.0",
+  "description": "Node redistribution of the protoc-gen-grpc-web plugin. Made for grpc-gen users.",
+  "main": "index.js",
+  "bin": {
+    "protoc-gen-grpc-web": "./cli.js"
+  },
+  "os": [
+    "win32",
+    "linux"
+  ],
+  "scripts": {
+    "install": "node install.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zaucy/grpc-web.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/zaucy/grpc-web/issues"
+  },
+  "homepage": "https://github.com/zaucy/grpc-web#readme",
+  "dependencies": {
+    "download": "^7.0.0"
+  }
+}
