@@ -1,6 +1,6 @@
 {
   "name": "@grpc-gen/protoc-gen-grpc-web",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Node redistribution of the protoc-gen-grpc-web plugin. Made for grpc-gen users.",
   "main": "index.js",
   "bin": {
