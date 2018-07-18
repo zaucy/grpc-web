@@ -1,9 +1,12 @@
 # Overview
 
-The purpose of this document is to list all the features that we believe are useful for gRPC users. 
-We hope to use your [votes](https://docs.google.com/forms/d/1NjWpyRviohn5jaPntosBHXRXZYkh_Ffi4GxJZFibylM/edit) to prioritize the work to either publish Google's existing solutions or develop some of the features
-directly in the open-source repo. For the latter case, please mention if you are interested in contributing to any of the road-map
-features.
+The purpose of this document is to list all the features that we believe are useful for gRPC users.
+
+We would like your feedback! Please tell us which features you would most want to see, so that we can prioritize the work to
+either publish Google's existing solutions or develop some of the features directly in the open-source repo. For the latter
+case, please mention if you are interested in contributing to any of the road-map features :)
+
+[Survey link](https://docs.google.com/forms/d/1NjWpyRviohn5jaPntosBHXRXZYkh_Ffi4GxJZFibylM/edit)
 
 # Background
 
@@ -21,7 +24,7 @@ and meeting those requirements unique to Google's Web ecosystems or their applic
 ## Non-binary message encoding
 
 The binary protobuf encoding format is not most CPU efficient for browser clients. 
-Furthremore, the generated code size increases as the total protobuf definition increases.
+Furthermore, the generated code size increases as the total protobuf definition increases.
 
 For Google's Web applications (e.g. gmail), we use a JSON like format 
 which is comparable to JSON in efficiency but also very compact in both the message size and code size.
@@ -38,8 +41,9 @@ Progressing events, I/O event throttling are other concerns.
 
 ## Bidi support
 
-We are yet to finalize the bidi transport story. At the same time, please tell us your exact use case, 
-and maybe explain why server-streaming is insufficient.
+As WebSocket over HTTP/2 becomes more available, we may add bidi support over WebSockets.
+
+At the same time, please tell us your exact use case, and maybe explain why server-streaming is insufficient.
 
 ## Security
 
