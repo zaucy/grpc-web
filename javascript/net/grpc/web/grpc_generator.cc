@@ -47,6 +47,11 @@ enum Mode {
   GRPCWEB = 4,     // client using the application/grpc-web wire format
 };
 
+enum ImportStyle {
+  CLOSURE = 0,           // goog.require("grpc.web.*")
+  COMMONJS_GRPC_GEN = 1, // const grpcWeb = require("@grpc-gen/grpc-web")
+};
+
 string GetModeVar(const Mode mode) {
   switch (mode) {
     case OP:
@@ -111,6 +116,35 @@ void PrintMessagesDeps(Printer* printer, const FileDescriptor* file) {
   std::map<string, string> vars;
   for (std::map<string, const Descriptor*>::iterator it = messages.begin();
        it != messages.end(); it++) {
+    vars["full_name"] = it->first;
+    printer->Print(
+        vars,
+        "goog.require('proto.$full_name$');\n");
+  }
+  printer->Print("\n\n\n");
+}
+
+void PrintCommonJsMessagesDeps(Printer* printer, const FileDescriptor* file) {
+  std::map<string, const Descriptor*> messages = GetAllMessages(file);
+  std::map<string, string> vars;
+
+  printer->Print(vars, "const proto = {};\n");
+
+  for (std::map<string, const Descriptor*>::iterator it = messages.begin();
+       it != messages.end(); it++) {
+    string fullName = it->first;
+
+    size_t offset = 0;
+    size_t dotIndex = fullName.find(".");
+
+    while(dotIndex > -1) {
+      vars["current_package_ns"] = fullName.substr(0, dotIndex);
+      printer->Print(vars, "proto.$current_package_ns$ = {};\n");
+
+      offset = dotIndex;
+      dotIndex = fullName.find(".");
+    }
+
     vars["full_name"] = it->first;
     printer->Print(
         vars,
@@ -289,11 +323,16 @@ class GrpcCodeGenerator : public CodeGenerator {
 
     string file_name;
     string mode;
+    string import_style_str;
+    ImportStyle import_style;
+  
     for (int i = 0; i < options.size(); ++i) {
       if (options[i].first == "out") {
         file_name = options[i].second;
       } else if (options[i].first == "mode") {
         mode = options[i].second;
+      } else if (options[i].first == "import_style") {
+        import_style_str = options[i].second;
       } else {
         *error = "unsupported options: " + options[i].first;
         return false;
@@ -328,6 +367,15 @@ class GrpcCodeGenerator : public CodeGenerator {
       return false;
     }
 
+    if(import_style_str == "closure" || import_style_str.empty()) {
+      import_style = ImportStyle::CLOSURE;
+    } else if(import_style_str == "commonjs-grpc-gen") {
+      import_style = ImportStyle::COMMONJS_GRPC_GEN;
+    } else {
+      *error = "options: invalid import_style - " + import_style_str;
+      return false;
+    }
+
     std::unique_ptr<ZeroCopyOutputStream> output(
         context->Open(file_name));
     Printer printer(output.get(), '$');
@@ -336,18 +384,49 @@ class GrpcCodeGenerator : public CodeGenerator {
     for (int i = 0; i < file->service_count(); ++i) {
       const ServiceDescriptor* service = file->service(i);
       vars["service_name"] = service->name();
-      printer.Print(
-          vars,
-          "goog.provide('proto.$package_dot$$service_name$Client');\n");
+      switch(import_style) {
+        case ImportStyle::CLOSURE:
+          printer.Print(
+            vars,
+            "goog.provide('proto.$package_dot$$service_name$Client');\n");
+          break;
+      }
+
     }
     printer.Print("\n");
 
-    printer.Print(vars, "goog.require('grpc.web.$mode$ClientBase');\n");
-    printer.Print(vars, "goog.require('grpc.web.AbstractClientBase');\n");
-    printer.Print(vars, "goog.require('grpc.web.ClientReadableStream');\n");
-    printer.Print(vars, "goog.require('grpc.web.Error');\n");
-    PrintMessagesDeps(&printer, file);
-    printer.Print("goog.scope(function() {\n\n");
+    switch(import_style) {
+      case ImportStyle::CLOSURE:
+        printer.Print(vars, "goog.require('grpc.web.$mode$ClientBase');\n");
+        printer.Print(vars, "goog.require('grpc.web.AbstractClientBase');\n");
+        printer.Print(vars, "goog.require('grpc.web.ClientReadableStream');\n");
+        printer.Print(vars, "goog.require('grpc.web.Error');\n");
+
+        PrintMessagesDeps(&printer, file);
+        printer.Print("goog.scope(function() {\n\n");
+        break;
+      case ImportStyle::COMMONJS_GRPC_GEN:
+        printer.Print(vars, "const {\n");
+        printer.Indent();
+        printer.Print(vars, "$mode$ClientBase,\n");
+        printer.Print(vars, "AbstractClientBase,\n");
+        printer.Print(vars, "ClientReadableStream,\n");
+        printer.Print(vars, "Error,\n");
+        printer.Outdent();
+        printer.Print("} = require('@grpc-gen/grpc-web');\n\n");
+        PrintCommonJsMessagesDeps(&printer, file);
+
+        printer.Print(vars, "const grpc = {};\n");
+        printer.Print(vars, "grpc.web = {\n");
+        printer.Indent();
+        printer.Print(vars, "$mode$ClientBase: $mode$ClientBase,");
+        printer.Print(vars, "AbstractClientBase: AbstractClientBase,\n");
+        printer.Print(vars, "ClientReadableStream: ClientReadableStream,\n");
+        printer.Print(vars, "Error: Error,\n");
+        printer.Outdent();
+        printer.Print(vars, "};\n\n");
+        break;
+    }
 
     for (int service_index = 0;
          service_index < file->service_count();
@@ -376,7 +455,15 @@ class GrpcCodeGenerator : public CodeGenerator {
       }
     }
 
-    printer.Print("}); // goog.scope\n\n");
+    switch(import_style) {
+      case ImportStyle::CLOSURE:
+        printer.Print("}); // goog.scope\n\n");
+        break;
+      case ImportStyle::COMMONJS_GRPC_GEN:
+        printer.Print(vars, "module.exports = proto.$package_dot$;\n\n");
+        break;
+    }
+
     return true;
   }
 };
