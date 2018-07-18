@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2018 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +11,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set -ex
 
-cd "$(dirname "$0")"/..
-git submodule update --init
-cd third_party/closure-library && git checkout tags/v20171112 -f && cd ../..
-cd third_party/openssl && git checkout tags/OpenSSL_1_0_2h -f && cd ../..
-cd third_party/grpc && git checkout d8772cf -f && git submodule update --init && cd ../..
+FROM ubuntu:16.04
+
+ARG MAKEFLAGS=-j8
+
+RUN apt-get update && apt-get install -y \
+  autoconf \
+  automake \
+  build-essential \
+  curl \
+  git \
+  default-jdk \
+  default-jre \
+  libtool \
+  libssl-dev \
+  make \
+  nginx \
+  zip
+
+RUN git clone https://github.com/grpc/grpc-web /github/grpc-web
+
+RUN cd /github/grpc-web && \
+  ./scripts/init_submodules.sh
+
+RUN cd /github/grpc-web/third_party/grpc && \
+  make && make install
+
+RUN cd /github/grpc-web/third_party/grpc/third_party/protobuf && \
+  make install
