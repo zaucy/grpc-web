@@ -142,7 +142,7 @@ void PrintCommonJsMessagesDeps(Printer* printer, const FileDescriptor* file) {
       printer->Print(vars, "proto.$current_package_ns$ = {};\n");
 
       offset = dotIndex;
-      dotIndex = fullName.find(".");
+      dotIndex = fullName.find(".", offset);
     }
 
     vars["full_name"] = it->first;
