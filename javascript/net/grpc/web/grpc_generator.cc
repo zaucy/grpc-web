@@ -136,11 +136,11 @@ void PrintCommonJsMessagesDeps(Printer* printer, const FileDescriptor* file) {
     size_t offset = 0;
     size_t dotIndex = package.find('.');
 
-    while(dotIndex > -1) {
+    while(dotIndex != string::npos) {
       vars["current_package_ns"] = package.substr(0, dotIndex);
       printer->Print(vars, "proto.$current_package_ns$ = {};\n");
 
-      offset = dotIndex;
+      offset = dotIndex + 1;
       dotIndex = package.find(".", offset);
     }
 
