@@ -3,9 +3,10 @@ const path = require("path");
 const download = require("download");
 
 const PLUGIN = require("./");
+const PACKAGE = require(path.resolve(__dirname, "./package.json"));
 
 const PREFIX = "https://github.com/zaucy/grpc-web/releases/download/";
-const VERSION = "0.0.1";
+const VERSION = PACKAGE.version;
 const EXT = process.platform == 'win32' ? '.exe' : '';
 
 download(
