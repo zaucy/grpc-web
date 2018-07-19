@@ -456,7 +456,7 @@ class GrpcCodeGenerator : public CodeGenerator {
         printer.Print("}); // goog.scope\n\n");
         break;
       case ImportStyle::COMMONJS_GRPC_GEN:
-        printer.Print(vars, "module.exports = proto.$package_dot$;\n\n");
+        printer.Print(vars, "module.exports = proto.$package$;\n\n");
         break;
     }
 
