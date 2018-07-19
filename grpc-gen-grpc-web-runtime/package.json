@@ -4,7 +4,6 @@
   "description": "grpc-web runtime",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "npm run build",
     "build": "node scripts/build.js"
   },
