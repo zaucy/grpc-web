@@ -127,30 +127,41 @@ void PrintMessagesDeps(Printer* printer, const FileDescriptor* file) {
 void PrintCommonJsMessagesDeps(Printer* printer, const FileDescriptor* file) {
   std::map<string, const Descriptor*> messages = GetAllMessages(file);
   std::map<string, string> vars;
+  string package = file->package();
+  vars["package_name"] = package;
 
   printer->Print(vars, "const proto = {};\n");
+  if(!package.empty()) {
+
+    size_t offset = 0;
+    size_t dotIndex = package.find('.');
+
+    while(dotIndex > -1) {
+      vars["current_package_ns"] = package.substr(0, dotIndex);
+      printer->Print(vars, "proto.$current_package_ns$ = {};\n");
+
+      offset = dotIndex;
+      dotIndex = package.find(".", offset);
+    }
+
+    printer->Print(vars, "proto.$package_name$ = {};\n");
+  }
 
   for (std::map<string, const Descriptor*>::iterator it = messages.begin();
        it != messages.end(); it++) {
     string fullName = it->first;
+    string messageName = it->second->name();
 
-    size_t offset = 0;
-    size_t dotIndex = fullName.find(".");
-
-    while(dotIndex > -1) {
-      vars["current_package_ns"] = fullName.substr(0, dotIndex);
-      printer->Print(vars, "proto.$current_package_ns$ = {};\n");
-
-      offset = dotIndex;
-      dotIndex = fullName.find(".", offset);
+    for(auto i=0; messageName.length() > i; ++i) {
+      messageName[i] = ::tolower(messageName[i]);
     }
 
-    vars["full_name"] = it->first;
-    printer->Print(
-        vars,
-        "goog.require('proto.$full_name$');\n");
+    vars["full_name"] = fullName;
+    vars["message_name"] = messageName;
+    
+    printer->Print(vars, "proto.$full_name$ = require('./$message_name$.js');\n");
   }
-  printer->Print("\n\n\n");
+  printer->Print("\n\n");
 }
 
 void PrintFileHeader(Printer* printer, const std::map<string, string>& vars) {
@@ -338,6 +349,7 @@ class GrpcCodeGenerator : public CodeGenerator {
         return false;
       }
     }
+
     if (file_name.empty()) {
       *error = "options: out is required";
       return false;
@@ -406,25 +418,9 @@ class GrpcCodeGenerator : public CodeGenerator {
         printer.Print("goog.scope(function() {\n\n");
         break;
       case ImportStyle::COMMONJS_GRPC_GEN:
-        printer.Print(vars, "const {\n");
-        printer.Indent();
-        printer.Print(vars, "$mode$ClientBase,\n");
-        printer.Print(vars, "AbstractClientBase,\n");
-        printer.Print(vars, "ClientReadableStream,\n");
-        printer.Print(vars, "Error,\n");
-        printer.Outdent();
-        printer.Print("} = require('@grpc-gen/grpc-web');\n\n");
-        PrintCommonJsMessagesDeps(&printer, file);
-
         printer.Print(vars, "const grpc = {};\n");
-        printer.Print(vars, "grpc.web = {\n");
-        printer.Indent();
-        printer.Print(vars, "$mode$ClientBase: $mode$ClientBase,");
-        printer.Print(vars, "AbstractClientBase: AbstractClientBase,\n");
-        printer.Print(vars, "ClientReadableStream: ClientReadableStream,\n");
-        printer.Print(vars, "Error: Error,\n");
-        printer.Outdent();
-        printer.Print(vars, "};\n\n");
+        printer.Print(vars, "grpc.web = require('@grpc-gen/grpc-web');\n\n");
+        PrintCommonJsMessagesDeps(&printer, file);
         break;
     }
 
