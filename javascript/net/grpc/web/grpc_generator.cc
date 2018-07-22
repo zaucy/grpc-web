@@ -128,7 +128,11 @@ void PrintCommonJsMessagesDeps(Printer* printer, const FileDescriptor* file) {
   std::map<string, const Descriptor*> messages = GetAllMessages(file);
   std::map<string, string> vars;
   string package = file->package();
+  string filename = file->name();
+  // Remove .proto extension
+  filename = filename.substr(0, filename.size() - 6);
   vars["package_name"] = package;
+  vars["filename"] = filename;
 
   printer->Print(vars, "const proto = {};\n");
   if(!package.empty()) {
@@ -143,25 +147,9 @@ void PrintCommonJsMessagesDeps(Printer* printer, const FileDescriptor* file) {
       offset = dotIndex + 1;
       dotIndex = package.find(".", offset);
     }
-
-    printer->Print(vars, "proto.$package_name$ = {};\n");
   }
 
-  for (std::map<string, const Descriptor*>::iterator it = messages.begin();
-       it != messages.end(); it++) {
-    string fullName = it->first;
-    string messageName = it->second->name();
-
-    for(auto i=0; messageName.length() > i; ++i) {
-      messageName[i] = ::tolower(messageName[i]);
-    }
-
-    vars["full_name"] = fullName;
-    vars["message_name"] = messageName;
-    
-    printer->Print(vars, "proto.$full_name$ = require('./$message_name$.js');\n");
-  }
-  printer->Print("\n\n");
+  printer->Print(vars, "proto.$package_name$ = require('./$filename$_pb.js');\n\n");
 }
 
 void PrintFileHeader(Printer* printer, const std::map<string, string>& vars) {

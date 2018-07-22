@@ -20,6 +20,7 @@ const grpcWebExports = [
   "grpc.web.Status",
   "grpc.web.StatusCode",
   "grpc.web.StreamBodyClientReadableStream",
+  "grpc.web.GrpcWebClientBase",
 
   // @NOTE: Are these necessary?
   // "grpc.web.GatewayClientBase",
