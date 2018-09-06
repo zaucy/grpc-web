@@ -1,3 +1,4 @@
+const path = require('path');
 const fs = require('fs-extra');
 const download = require('download');
 const PLUGIN = require("./");
@@ -15,9 +16,13 @@ async function start() {
   const {version} = await fs.readJson(packageJsonPath);
   const execFilename = 'protoc-gen-grpc-web-' + process.platform + EXT;
 
-  const downloadUrl = DL_PREFIX + VERSION_PREFIX + version + execFilename;
+  const downloadUrl = DL_PREFIX + VERSION_PREFIX + version + '/' + execFilename;
 
-  const buffer = await download(downloadUrl);
+  console.log("Downloading", downloadUrl);
+  const buffer = await download(downloadUrl).catch(err => {
+    console.error(err.message);
+    process.exit(1);
+  });
 
   const pluginStream = fs.createWriteStream(PLUGIN);
   pluginStream.write(buffer);
