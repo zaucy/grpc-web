@@ -2,8 +2,9 @@ const fs = require('fs-extra');
 const download = require('download');
 const PLUGIN = require("./");
 
-const DL_PREFIX = 'https://github.com/zaucy/grpc-web/releases/download/';
+const OWNER = 'zaucy';
 const REPO = 'grpc-web';
+const DL_PREFIX = `https://github.com/${OWNER}/${REPO}/releases/download/`;
 const BIN_DIR = path.resolve(__dirname, "bin");
 const EXT = process.platform === 'win32' ? '.exe' : '';
 
