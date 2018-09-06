@@ -10,3 +10,8 @@ steps:
 
 - script: bazel build javascript/net/grpc/web:protoc-gen-grpc-web -c opt && cp -r ./bazel-out/*-opt/bin/*protoc-gen-grpc-web ./bin
   workingDirectory: $(Build.SourcesDirectory)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: $(Build.SourcesDirectory)/bin 
+    artifactName: protoc-gen-grpc-web-darwin 
