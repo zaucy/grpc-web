@@ -5,3 +5,4 @@ bazel-out
 bazel-testlogs
 *.o
 protoc-gen-*
+!/packages/protoc-gen-grpc-web

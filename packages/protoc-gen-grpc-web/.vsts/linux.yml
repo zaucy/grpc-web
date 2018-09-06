@@ -1,0 +1,13 @@
+steps:
+
+- script: apt-get install -y pkg-config zip g++ zlib1g-dev unzip python
+  workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web
+
+- script: curl -s bazel-1.16.1-installer-linux-x86_64.sh -o bazel-installer.sh
+  workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web
+
+- script: chmod +x ./bazel-installer.sh && ./bazel-installer.sh --user
+  workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web
+
+- script: $HOME/bin/bazel build javascript/net/grpc/web:protoc-gen-grpc-web -c opt && cp -r ./bazel-out/*-opt/bin/*protoc-gen-grpc-web ./bin
+  workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web

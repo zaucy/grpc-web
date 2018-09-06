@@ -1,0 +1,23 @@
+{
+  "name": "protoc-gen-grpc-web",
+  "version": "0.0.0",
+  "author": "Google Inc.",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zaucy/grpc-web.git"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/zaucy/grpc-web/issues"
+  },
+  "homepage": "https://github.com/zaucy/grpc-web#readme",
+  "dependencies": {
+    "download": "^7.1.0",
+    "fs-extra": "^7.0.0"
+  }
+}
