@@ -10,4 +10,4 @@ steps:
   workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web
 
 - script: $HOME/bin/bazel build javascript/net/grpc/web:protoc-gen-grpc-web -c opt && cp -r ./bazel-out/*-opt/bin/*protoc-gen-grpc-web ./bin
-  workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web
+  workingDirectory: $(Build.SourcesDirectory)
