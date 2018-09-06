@@ -1,7 +1,7 @@
 {
-  "name": "protoc-gen-grpc-web",
-  "version": "0.0.0",
-  "author": "Google Inc.",
+  "name": "zaucy-protoc-gen-grpc-web",
+  "version": "0.0.1",
+  "author": "Ezekiel Warren",
   "description": "",
   "main": "index.js",
   "bin": {
