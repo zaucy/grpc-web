@@ -4,6 +4,7 @@
   "author": "Google Inc.",
   "description": "",
   "main": "index.js",
+  "bin": "./cli.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

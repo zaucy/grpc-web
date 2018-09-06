@@ -14,5 +14,5 @@ steps:
 
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web/bin
+    pathtoPublish: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web/bin/protoc-gen-grpc-web-linux
     artifactName: protoc-gen-grpc-web-linux
