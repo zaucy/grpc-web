@@ -7,6 +7,7 @@ const REPO = 'grpc-web';
 const DL_PREFIX = `https://github.com/${OWNER}/${REPO}/releases/download/`;
 const BIN_DIR = path.resolve(__dirname, "bin");
 const EXT = process.platform === 'win32' ? '.exe' : '';
+const VERSION_PREFIX = 'zaucy-';
 
 async function start() {
   await fs.ensureDir(BIN_DIR);
@@ -14,7 +15,7 @@ async function start() {
   const {version} = await fs.readJson(packageJsonPath);
   const execFilename = 'protoc-gen-grpc-web-' + process.platform + EXT;
 
-  const downloadUrl = DL_PREFIX + REPO + '-' + version + execFilename;
+  const downloadUrl = DL_PREFIX + VERSION_PREFIX + version + execFilename;
 
   const buffer = await download(downloadUrl);
 
@@ -26,5 +27,3 @@ async function start() {
 }
 
 start();
-
-
