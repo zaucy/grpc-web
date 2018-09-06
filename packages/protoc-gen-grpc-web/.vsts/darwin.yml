@@ -1,6 +1,6 @@
 steps:
 
-- script: xcodebuild -license accept
+- script: sudo xcodebuild -license accept
   workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web
 
 - script: curl -s bazel-1.16.1-installer-darwin-x86_64.sh -o bazel-installer.sh
