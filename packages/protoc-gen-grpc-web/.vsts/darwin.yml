@@ -8,10 +8,10 @@ steps:
 - script: chmod +x ./bazel-installer.sh && ./bazel-installer.sh --user
   workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web
 
-- script: bazel build javascript/net/grpc/web:protoc-gen-grpc-web -c opt && cp -r ./bazel-out/*-opt/bin/*protoc-gen-grpc-web ./bin
+- script: bazel build javascript/net/grpc/web:protoc-gen-grpc-web -c opt && cp ./bazel-out/darwin-opt/bin/javascript/net/grpc/web/protoc-gen-grpc-web ./packages/protoc-gen-grpc-web/bin/protoc-gen-grpc-web-darwin
   workingDirectory: $(Build.SourcesDirectory)
 
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: $(Build.SourcesDirectory)/bin 
+    pathtoPublish: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web/bin
     artifactName: protoc-gen-grpc-web-darwin 
