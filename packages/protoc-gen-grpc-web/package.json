@@ -1,6 +1,6 @@
 {
   "name": "zaucy-protoc-gen-grpc-web",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Ezekiel Warren",
   "description": "",
   "main": "index.js",
