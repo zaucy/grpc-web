@@ -12,13 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM grpcweb/common
+FROM envoyproxy/envoy:latest
 
-RUN cd /github/grpc-web-base/net/grpc/gateway/examples/echo && \
-  sed -i 's/localhost:9090/node-server:9090/g' nginx.conf
+COPY ./envoy.yaml /etc/envoy/envoy.yaml
 
-RUN cd /github/grpc-web-base && \
-  make standalone-proxy
-
-EXPOSE 8080
-CMD ["/github/grpc-web-base/gConnector_static/nginx.sh"]
+CMD /usr/local/bin/envoy -c /etc/envoy/envoy.yaml
