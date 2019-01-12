@@ -3,7 +3,7 @@ steps:
 - script: choco install bazel || exit 0
   workingDirectory: $(Build.SourcesDirectory)/packages/protoc-gen-grpc-web
 
-- script: bazel build javascript/net/grpc/web:protoc-gen-grpc-web -c opt && copy .\bazel-out\x64_windows-opt\bin\javascript\net\grpc\web\protoc-gen-grpc-web.exe .\packages\protoc-gen-grpc-web\bin\protoc-gen-grpc-web-win32.exe
+- script: bazel version && bazel build javascript/net/grpc/web:protoc-gen-grpc-web -c opt && copy .\bazel-out\x64_windows-opt\bin\javascript\net\grpc\web\protoc-gen-grpc-web.exe .\packages\protoc-gen-grpc-web\bin\protoc-gen-grpc-web-win32.exe
   workingDirectory: $(Build.SourcesDirectory)
 
 - task: PublishBuildArtifacts@1
