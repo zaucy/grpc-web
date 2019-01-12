@@ -12,21 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM node:8-stretch
+FROM ubuntu:14.04
+
+ARG MAKEFLAGS=-j8
 
 RUN apt-get -qq update && apt-get -qq install -y \
-  unzip
+  autoconf \
+  automake \
+  build-essential \
+  curl \
+  git \
+  libtool \
+  libpcre3-dev \
+  libssl-dev \
+  make \
+  software-properties-common \
+  zip
 
 RUN git clone https://github.com/grpc/grpc-web /github/grpc-web
 
-RUN curl -sSL https://github.com/protocolbuffers/protobuf/releases/download/v3.6.1/\
-protoc-3.6.1-linux-x86_64.zip -o /tmp/protoc.zip && \
-  cd /tmp && \
-  unzip -qq protoc.zip && \
-  cp /tmp/bin/protoc /usr/local/bin/protoc
+COPY ./javascript /github/grpc-web/javascript
 
-RUN curl -sSL https://github.com/grpc/grpc-web/releases/download/1.0.3/\
-protoc-gen-grpc-web-1.0.3-linux-x86_64 -o /usr/local/bin/protoc-gen-grpc-web && \
-  chmod +x /usr/local/bin/protoc-gen-grpc-web
+RUN cd /github/grpc-web && \
+  ./scripts/init_submodules.sh
 
-RUN mkdir -p /var/www/html/dist
+RUN cd /github/grpc-web/third_party/grpc/third_party/protobuf && \
+  ./autogen.sh && ./configure && make && make install
+
+RUN cd /github/grpc-web/javascript/net/grpc/web && \
+  make protoc-gen-grpc-web

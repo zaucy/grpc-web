@@ -28,12 +28,18 @@ do
 done
 
 # Build all relevant docker images. They should all build successfully.
-docker-compose build
+docker-compose -f advanced.yml build
 
 # Run all bazel unit tests
-bazel test \
+BAZEL_VERSION=0.19.1
+wget https://github.com/bazelbuild/bazel/releases/download/"${BAZEL_VERSION}"/bazel-"${BAZEL_VERSION}"-installer-linux-x86_64.sh
+chmod +x ./bazel-"${BAZEL_VERSION}"-installer-linux-x86_64.sh
+./bazel-"${BAZEL_VERSION}"-installer-linux-x86_64.sh --user
+$HOME/bin/bazel version
+$HOME/bin/bazel test \
   //javascript/net/grpc/web/... \
   //net/grpc/gateway/examples/...
+rm ./bazel-"${BAZEL_VERSION}"-installer-linux-x86_64.sh
 
 # Build the grpc-web npm package
 cd packages/grpc-web && \
@@ -53,5 +59,5 @@ source ./scripts/test-proxy.sh
 docker-compose down
 
 # Run unit tests from npm package
-docker run --rm grpcweb/common /bin/bash \
+docker run --rm grpcweb/prereqs /bin/bash \
   /github/grpc-web/scripts/docker-run-tests.sh
