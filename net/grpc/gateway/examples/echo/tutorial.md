@@ -26,19 +26,16 @@ service EchoService {
 
 ## Implement gRPC Backend Server
 
-Next, we implement our EchoService interface using C++ in the backend gRPC
+Next, we implement our EchoService interface using Node in the backend gRPC
 `EchoServer`. This will handle requests from clients. See the file
-[`echo_server.cc`](echo_server.cc) for details.
+[`node-server/server.js`](./node-server/server.js) for details.
 
 You can implement the server in any language supported by gRPC. Please see
 the [gRPC website][] for more details.
 
-```cpp
-Status EchoServiceImpl::Echo(ServerContext* context,
-                             const EchoRequest* request,
-                             EchoResponse* response) {
-  response->set_message(request->message());
-  return Status::OK;
+```js
+function doEcho(call, callback) {
+  callback(null, {message: call.request.message});
 }
 ```
 
@@ -70,7 +67,9 @@ this:
               domains: ["*"]
               routes:
               - match: { prefix: "/" }
-                route: { cluster: echo_service }
+                route:
+                  cluster: echo_service
+                  max_grpc_timeout: 0s
           http_filters:
           - name: envoy.grpc_web
           - name: envoy.router
@@ -80,7 +79,7 @@ this:
     type: logical_dns
     http2_protocol_options: {}
     lb_policy: round_robin
-    hosts: [{ socket_address: { address: echo-server, port_value: 9090 }}]
+    hosts: [{ socket_address: { address: node-server, port_value: 9090 }}]
 ```
 
 You may also need to add some CORS setup to make sure the browser can request
@@ -136,7 +135,7 @@ Our command generates the client stub, by default, to the file
 Now you are ready to write some JS client code. Put this in a `client.js` file.
 
 ```js
-const {EchoRequest, EchoResponse} = require('./echo_pb.js'));
+const {EchoRequest, EchoResponse} = require('./echo_pb.js');
 const {EchoServiceClient} = require('./echo_grpc_web_pb.js');
 
 var echoService = new EchoServiceClient('http://localhost:8080');
@@ -156,7 +155,7 @@ You will need a `package.json` file
   "name": "grpc-web-commonjs-example",
   "dependencies": {
     "google-protobuf": "^3.6.1",
-    "grpc-web": "^0.4.0"
+    "grpc-web": "^1.0.0"
   },
   "devDependencies": {
     "browserify": "^16.2.2",

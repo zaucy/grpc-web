@@ -5,40 +5,30 @@ example. The example has 3 key components:
 
  - Front-end JS client
  - Envoy proxy
- - gRPC backend server (written in C++)
-
-
-## Before you start
-
-Before you start, ensure that you have the following installed exactly as per
-our [pre-requisites](../../../../../INSTALL.md):
-
- 1. Protocol buffers
- 2. gRPC
- 3. Closure compiler
+ - gRPC backend server (written in Node)
 
 
 From the repo root directory:
 
 ## Build pre-requisites
 
-This step compiles gRPC and Protobuf, and serves as the base docker image for
-the subsequent docker images.
+This step downloads the necessary pre-requisites, and serves as the base docker
+image for the subsequent docker images.
 
 ```sh
-$ docker build -t grpcweb/prereqs \
-  -f net/grpc/gateway/docker/prereqs/Dockerfile .
+$ docker build -t grpcweb/common \
+  -f net/grpc/gateway/docker/common/Dockerfile .
 ```
 
 ## Run the gRPC Backend server
 
-This compiles the gRPC backend server, written in C++, and listens on port
+This compiles the gRPC backend server, written in Node, and listens on port
 9090.
 
 ```sh
-$ docker build -t grpcweb/echo-server \
-  -f net/grpc/gateway/docker/echo_server/Dockerfile .
-$ docker run -d -p 9090:9090 --name echo-server grpcweb/echo-server
+$ docker build -t grpcweb/node-server \
+  -f net/grpc/gateway/docker/node_server/Dockerfile .
+$ docker run -d -p 9090:9090 --name node-server grpcweb/node-server
 ```
 
 ## Run the Envoy proxy
@@ -49,7 +39,7 @@ requests will be forwarded to port 9090.
 ```sh
 $ docker build -t grpcweb/envoy \
   -f net/grpc/gateway/docker/envoy/Dockerfile .
-$ docker run -d -p 8080:8080 --link echo-server:echo-server grpcweb/envoy
+$ docker run -d -p 8080:8080 --link node-server:node-server grpcweb/envoy
 ```
 
 ## Serve static JS/HTML contents
@@ -58,9 +48,9 @@ This steps compiles the front-end gRPC-Web client into a static .JS file, and
 we use a simple server to serve up the JS/HTML static contents.
 
 ```sh
-$ docker build -t grpcweb/closure-client \
-  -f net/grpc/gateway/docker/closure_client/Dockerfile .
-$ docker run -d -p 8081:8081 grpcweb/closure-client
+$ docker build -t grpcweb/commonjs-client  \
+  -f net/grpc/gateway/docker/commonjs_client/Dockerfile .
+$ docker run -d -p 8081:8081 grpcweb/commonjs-client
 ```
 
 ## Run the example from your browser
@@ -68,7 +58,7 @@ $ docker run -d -p 8081:8081 grpcweb/closure-client
 Finally, open a browser tab, and inspect
 
 ```
-http://localhost/net/grpc/gateway/examples/echo/echotest.html
+http://localhost:8081/echotest.html
 ```
 
 ## What's next?

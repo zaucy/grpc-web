@@ -4,8 +4,8 @@ gRPC-Web provides a Javascript library that lets browser clients access a gRPC
 service. You can find out much more about gRPC in its own
 [website](https://grpc.io).
 
-The current release is a Beta release, and we expect to announce
-General-Availability by Oct. 2018.
+gRPC-Web is now Generally Available, and considered stable enough for production
+use.
 
 gRPC-Web clients connect to gRPC services via a special gateway proxy: the
 current version of the library uses [Envoy](https://www.envoyproxy.io/) by
@@ -16,15 +16,28 @@ frameworks, such as Python, Java, and Node. See the
 [roadmap](https://github.com/grpc/grpc-web/blob/master/ROADMAP.md) doc.
 
 
-## Quick Demo
+## Quick Start Guide: Hello World
 
-Try gRPC-Web and run a quick Echo example from the browser!
+You can follow the [Hello World Guide][] to get started with gRPC-Web quickly.
+
+From the guide, you will learn how to
+ - Define your service using protocol buffers
+ - Implement a simple gRPC Service using NodeJS
+ - Configure the Envoy proxy
+ - Generate protobuf message classes and client service stub for the client
+ - Compile all the JS dependencies into a static library that can be consumed
+   by the browser easily
+
+## Advanced Demo: Browser Echo App
+
+You can also try to run a more advanced Echo app from the browser with a
+streaming example.
 
 From the repo root directory:
 
 ```sh
-$ docker-compose pull prereqs common echo-server envoy commonjs-client
-$ docker-compose up -d echo-server envoy commonjs-client
+$ docker-compose pull
+$ docker-compose up
 ```
 
 Open a browser tab, and go to:
@@ -46,10 +59,20 @@ $ npm i grpc-web
 
 ## Code Generator Plugin
 
-You can compile the `protoc-gen-grpc-web` protoc plugin from this repo:
+You can download the `protoc-gen-grpc-web` protoc plugin from our
+[release](https://github.com/grpc/grpc-web/releases) page:
 
-```sh
-$ sudo make install-plugin
+If you don't already have `protoc` installed, you will have to download it
+first from [here](https://github.com/protocolbuffers/protobuf/releases).
+
+Make sure they are both executable and are discoverable from your PATH.
+
+For example, in MacOS, you can do:
+
+```
+$ sudo mv ~/Downloads/protoc-gen-grpc-web-1.0.3-darwin-x86_64 \
+  /usr/local/bin/protoc-gen-grpc-web
+$ chmod +x /usr/local/bin/protoc-gen-grpc-web
 ```
 
 
@@ -84,6 +107,7 @@ typings file will also be generated for the protobuf messages and service stub.
 `import_style=typescript`: (Experimental) The service stub will be generated
 in TypeScript.
 
+**Note: `commonjs+dts` and `typescript` only works with `--grpc-web_out=` import style.**
 
 ### Wire Format Mode
 
@@ -138,10 +162,10 @@ service EchoService {
 
 Next you need to have a gRPC server that implements the service interface and a
 gateway proxy that allows the client to connect to the server. Our example
-builds a simple C++ gRPC backend server and the Envoy proxy.
+builds a simple Node gRPC backend server and the Envoy proxy.
 
 For the Echo service: see the
-[service implementations](https://github.com/grpc/grpc-web/blob/master/net/grpc/gateway/examples/echo/echo_service_impl.cc).
+[service implementations](https://github.com/grpc/grpc-web/blob/master/net/grpc/gateway/examples/echo/node-server/server.js).
 
 For the Envoy proxy: see the
 [config yaml file](https://github.com/grpc/grpc-web/blob/master/net/grpc/gateway/examples/echo/envoy.yaml).
@@ -168,7 +192,7 @@ var metadata = {'custom-header-1': 'value1'};
 var call = echoService.echo(request, metadata, function(err, response) {
   if (err) {
     console.log(err.code);
-    console.log(err.messge);
+    console.log(err.message);
   } else {
     console.log(response.getMessage());
   }
@@ -183,7 +207,7 @@ call.on('status', function(status) {
 Server-side streaming is supported!
 
 ```js
-var stream = echoService.serverStreamingEcho(streamRequest, metatada);
+var stream = echoService.serverStreamingEcho(streamRequest, metadata);
 stream.on('data', function(response) {
   console.log(response.getMessage());
 });
@@ -199,6 +223,22 @@ stream.on('end', function(end) {
 
 You can find a more in-depth tutorial from
 [this page](https://github.com/grpc/grpc-web/blob/master/net/grpc/gateway/examples/echo/tutorial.md).
+
+## Setting Deadline
+
+You can set a deadline for your RPC by setting a `deadline` header. The value
+should be a Unix timestamp, in milliseconds.
+
+```js
+var deadline = new Date();
+deadline.setSeconds(deadline.getSeconds() + 1);
+
+client.sayHelloAfterDelay(request, {deadline: deadline.getTime()},
+  (err, response) => {
+    // err will be populated if the RPC exceeds the deadline
+    ...
+  });
+```
 
 ## TypeScript Support
 
@@ -239,20 +279,20 @@ Multiple proxies supports the gRPC-Web protocol. Currently, the default proxy
 is [Envoy](https://www.envoyproxy.io), which supports gRPC-Web out of the box.
 
 ```sh
-$ docker-compose up -d echo-server envoy commonjs-client
+$ docker-compose up -d node-server envoy commonjs-client
 ```
 
 An alternative is to build Nginx that comes with this repository.
 
 ```sh
-$ docker-compose up -d echo-server nginx commonjs-client
+$ docker-compose -f advanced.yml up -d echo-server nginx closure-client
 ```
 
 You can also try this
 [gRPC-Web Go Proxy](https://github.com/improbable-eng/grpc-web/tree/master/go/grpcwebproxy).
 
 ```sh
-$ docker-compose up -d echo-server grpcwebproxy binary-client
+$ docker-compose -f advanced.yml up -d node-server grpcwebproxy binary-client
 ```
 
 ## Acknowledgement
@@ -260,5 +300,19 @@ $ docker-compose up -d echo-server grpcwebproxy binary-client
 Big thanks to the following contributors for making significant contributions to
 this project!
 
-* [zaucy](https://github.com/zaucy)
-* [yannic](https://github.com/yannic)
+* [zaucy](https://github.com/zaucy): NPM package, CommonJS
+* [yannic](https://github.com/yannic): Bazel
+* [mitar](https://github.com/mitar): Codegen enhancements
+* [juanjoDiaz](https://github.com/juanjoDiaz): Codegen enhancements
+* [pumano](https://github.com/pumano): Doc fixes
+* [henriiik](https://github.com/henriiik): TypeScript
+* [rybbchao](https://github.com/rybbchao): Codgen bugfix
+* [mjduijn](https://github.com/mjduijn): Timeout example
+* [at-ishikawa](https://github.com/at-ishikawa): Codegen enhancements
+* [weilip](https://github.com/weilip): Codegen bugfix
+* [mitchdraft](https://github.com/mitchdraft): Update Node example
+* [factuno-db](https://github.com/factuno-db): Bazel, Closure
+* [shaxbee](https://github.com/shaxbee): Codegen enhancements and bugfixes
+
+
+[Hello World Guide]:https://github.com/grpc/grpc-web/blob/master/net/grpc/gateway/examples/helloworld/
