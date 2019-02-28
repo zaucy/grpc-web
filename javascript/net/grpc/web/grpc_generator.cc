@@ -528,7 +528,7 @@ void PrintCommonJsMessagesDeps(Printer* printer, const FileDescriptor* file) {
     // we need to give each cross-file import an alias
     printer->Print(
         vars,
-        "\nvar $alias$ = require('$dep_filename$_pb.js')\n");
+        "\nvar $alias$ = require('$dep_filename$_pb')\n");
   }
 
   string package = file->package();
@@ -555,11 +555,11 @@ void PrintCommonJsMessagesDeps(Printer* printer, const FileDescriptor* file) {
   if (!package.empty()) {
     printer->Print(
         vars,
-        "proto.$package_name$ = require('./$filename$_pb.js');\n\n");
+        "proto.$package_name$ = require('./$filename$_pb');\n\n");
   } else {
     printer->Print(
         vars,
-        "const proto = require('./$filename$_pb.js');\n\n");
+        "const proto = require('./$filename$_pb');\n\n");
   }
 }
 
@@ -1232,7 +1232,7 @@ class GrpcCodeGenerator : public CodeGenerator {
     }
 
     if (file_name.empty()) {
-      file_name = StripProto(file->name()) + "_grpc_web_pb.js";
+      file_name = StripProto(file->name()) + "_grpc_web_pb";
     }
     if (mode.empty()) {
       *error = "options: mode is required";
