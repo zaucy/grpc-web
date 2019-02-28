@@ -1281,7 +1281,7 @@ class GrpcCodeGenerator : public CodeGenerator {
       std::unique_ptr<ZeroCopyOutputStream> proto_dts_output(
           context->Open(proto_dts_file_name));
       Printer proto_dts_printer(proto_dts_output.get(), '$');
-      PrintProtoDtsFile(&proto_dts_printer, file);
+      // PrintProtoDtsFile(&proto_dts_printer, file);
     }
 
     if (!file->service_count()) {
