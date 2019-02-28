@@ -1232,7 +1232,7 @@ class GrpcCodeGenerator : public CodeGenerator {
     }
 
     if (file_name.empty()) {
-      file_name = StripProto(file->name()) + "_grpc_web_pb";
+      file_name = StripProto(file->name()) + "_grpc_web_pb.js";
     }
     if (mode.empty()) {
       *error = "options: mode is required";
@@ -1398,7 +1398,6 @@ class GrpcCodeGenerator : public CodeGenerator {
     if (generate_dts) {
       string grpcweb_dts_file_name =
           StripProto(file->name()) + "_grpc_web_pb.d.ts";
-      string proto_dts_file_name = StripProto(file->name()) + "_pb.d.ts";
 
       std::unique_ptr<ZeroCopyOutputStream> grpcweb_dts_output(
           context->Open(grpcweb_dts_file_name));
