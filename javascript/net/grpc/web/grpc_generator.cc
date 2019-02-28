@@ -1277,10 +1277,10 @@ class GrpcCodeGenerator : public CodeGenerator {
     }
 
     if (generate_dts || import_style == ImportStyle::TYPESCRIPT) {
-      string proto_dts_file_name = StripProto(file->name()) + "_pb.d.ts";
-      std::unique_ptr<ZeroCopyOutputStream> proto_dts_output(
-          context->Open(proto_dts_file_name));
-      Printer proto_dts_printer(proto_dts_output.get(), '$');
+      // string proto_dts_file_name = StripProto(file->name()) + "_pb.d.ts";
+      // std::unique_ptr<ZeroCopyOutputStream> proto_dts_output(
+      //     context->Open(proto_dts_file_name));
+      // Printer proto_dts_printer(proto_dts_output.get(), '$');
       // PrintProtoDtsFile(&proto_dts_printer, file);
     }
 
