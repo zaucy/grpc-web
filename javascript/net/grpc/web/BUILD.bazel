@@ -6,7 +6,6 @@ load("@io_bazel_rules_closure//closure:defs.bzl", "closure_js_test")
 
 cc_binary(
     name = "protoc-gen-grpc-web",
-    linkstatic = True,
     srcs = [
         "grpc_generator.cc",
     ],
